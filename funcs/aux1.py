@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-
 def obtener_precios_fred(
     fecha_inicio="2019-01-01",
     fecha_fin="2025-12-31"
@@ -51,7 +50,7 @@ def obtener_precios_fred(
     return resultado
 
 
-def proyectar_ingresos(datos, concepto):
+def proyectar_concepto(datos, concepto):
     años_historicos = list(range(2019, 2026))
     años_proyeccion = list(range(2026, 2031))
 
@@ -76,7 +75,31 @@ def proyectar_ingresos(datos, concepto):
         "ingresos_proyectados": ingresos_proyectados
     })
 
+    proyeccion.set_index("año")
+
     return proyeccion
+
+def proyeccion_porcentual(valor, pcte, t):
+    return valor * (1+ (pcte/100))**t
+
+def calcular_EBIT(anio, proyeccion_ingresos, proyeccion_costos , gastos_admin, otros_ingresos_ops):
+    t = anio - 2025
+
+    EBIT = (
+    (0.25 * proyeccion_ingresos.loc[[anio]]) - proyeccion_costos.loc[[anio]]
+        + 0
+    )
+
+
+def vpn_estrategia(flujos, tasa_descuento):
+    flujos = np.asarray(flujos, dtype=float)
+    periodos = np.arange(len(flujos))
+
+    return np.sum(
+        flujos / (1 + tasa_descuento) ** periodos
+    )
+
+## TEMP
 
 def precio_futuro(S0, r, T, **ajustes):
     carry = r
@@ -129,12 +152,3 @@ def call_trm(
     )
 
     return precio
-
-
-def vpn_estrategia(flujos, tasa_descuento):
-    flujos = np.asarray(flujos, dtype=float)
-    periodos = np.arange(len(flujos))
-
-    return np.sum(
-        flujos / (1 + tasa_descuento) ** periodos
-    )
